@@ -46,6 +46,13 @@ def fetch_matches_from_vectorstore(state: State, vectorstore, top_k=8):
 def generate_answer(state: State, llm):
     """Answer question using retrieved context."""
     prompt = (
+        "You are a helpful Dungeons & Dragons rules assistant. "
+        "Use the numbered context chunks below to answer the user's question. "
+        "Please note the page(s) used to justify your answer.\n\n"
+        f"Context:\n{state['non_parametric_data']}\n\n"
+        f"Question: {state['question']}"
+    )
+    page_prompt = (
         "You are a knowledgeable and helpful Dungeons & Dragons rules assistant. "
         "Your answer must be based exclusively on the provided context. "
         "Use the numbered context chunks to support your answer, and reference the corresponding pages numbers in your answer when applicable. "
@@ -53,5 +60,27 @@ def generate_answer(state: State, llm):
         f"Context:\n{state['non_parametric_data']}\n\n"
         f"Question: {state['question']}"
     )
-    response = llm.invoke(prompt)
+    example_prompt = (
+        "You are a knowledgeable and helpful Dungeons & Dragons rules assistant. "
+        "Your answer must be based exclusively on the provided context. "
+        "Use the numbered context chunks to support your answer and reference the corresponding page numbers when applicable. "
+        "If the context does not contain enough information, please state that additional details are needed.\n\n"
+        "Example 1:\n"
+        "Context:\n"
+        "\"Pages 120-123: In this section, the rules for critical hits are detailed. A natural 20 triggers extra damage dice.\"\n"
+        "Question:\n"
+        "\"What happens when a player scores a critical hit?\"\n"
+        "Answer:\n"
+        "\"When a critical hit is scored, the attacker rolls all the damage dice twice and sums the results. (See pages 120-123 for details.)\"\n\n"
+        "Example 2:\n"
+        "Context:\n"
+        "\"Pages 45-47: This section explains spell slot usage, detailing how spellcasters manage their limited resources.\"\n"
+        "Question:\n"
+        "\"How do spell slots work for a spellcaster?\"\n"
+        "Answer:\n"
+        "\"Spell slots represent a caster's limited resource for casting spells. Once used, they cannot be reused until a rest is taken. (Refer to pages 45-47.)\"\n\n"
+        f"Context:\n{state['non_parametric_data']}\n\n"
+        f"Question: {state['question']}"
+    )
+    response = llm.invoke(example_prompt)
     return {"answer": response.content}
