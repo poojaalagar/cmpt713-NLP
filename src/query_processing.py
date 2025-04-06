@@ -46,9 +46,10 @@ def fetch_matches_from_vectorstore(state: State, vectorstore, top_k=8):
 def generate_answer(state: State, llm):
     """Answer question using retrieved context."""
     prompt = (
-        "You are a helpful Dungeons & Dragons rules assistant. "
-        "Use the numbered context chunks below to answer the user's question. "
-        "Please note the page(s) used to justify your answer.\n\n"
+        "You are a knowledgeable and helpful Dungeons & Dragons rules assistant. "
+        "Your answer must be based exclusively on the provided context. "
+        "Use the numbered context chunks to support your answer, and reference the corresponding pages numbers in your answer when applicable. "
+        "If the context does not contain enough information, please state that additional details are needed. \n\n"
         f"Context:\n{state['non_parametric_data']}\n\n"
         f"Question: {state['question']}"
     )
